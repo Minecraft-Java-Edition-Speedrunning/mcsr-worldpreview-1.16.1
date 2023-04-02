@@ -21,6 +21,8 @@
     "client.render.chunk.BuiltChunkMixin",
     "client.render.LevelLoadingScreenMixin",
     "client.render.WorldRendererMixin",
+    "client.TitleScreenMixin",
+    "client.WorldGenerationProgressLoggerMixin",
 
     "client.MinecraftClientMixin",
     "client.KeyboardMixin",
