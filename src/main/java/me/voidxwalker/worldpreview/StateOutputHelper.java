@@ -44,6 +44,7 @@ public final class StateOutputHelper {
         try {
             // Java 11+ method
             Files.writeString(OUT_PATH, string);
+            WorldPreview.log(Level.INFO, "WorldPreview State: " + string);
         } catch (IOException ignored) {
             WorldPreview.log(Level.ERROR, "Failed to write state output!");
         }
