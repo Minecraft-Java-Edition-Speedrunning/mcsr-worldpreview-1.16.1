@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * A helper class for outputting the state to help macros handle Minecraft without
+ * A helper class for outputting and logging the current state of resetting to help with macros and verification without interrupting the regular flow of the game.
  */
 public final class StateOutputHelper {
     private static final Path OUT_PATH = Path.of("wpstateout.txt");
