@@ -1,5 +1,6 @@
 package me.voidxwalker.worldpreview.mixin.server;
 
+import me.voidxwalker.worldpreview.IFastCloseable;
 import me.voidxwalker.worldpreview.WorldPreview;
 import me.voidxwalker.worldpreview.mixin.access.SpawnLocatingMixin;
 import net.minecraft.client.MinecraftClient;
@@ -157,7 +158,7 @@ public abstract class MinecraftServerMixin  extends ReentrantThreadExecutor<Serv
             serverWorld2 = var2.next();
             if (serverWorld2 != null) {
                 try {
-                    serverWorld2.getChunkManager().threadedAnvilChunkStorage.close();
+                    ((IFastCloseable)serverWorld2.getChunkManager().threadedAnvilChunkStorage).fastClose();
                 }
                 catch (IOException ignored) {}
             }
