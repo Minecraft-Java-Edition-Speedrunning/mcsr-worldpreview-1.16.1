@@ -63,7 +63,7 @@ public abstract class MinecraftClientMixin {
                 WorldPreview.log(Level.INFO,"Leaving world generation");
                 WorldPreview.kill = 1;
                 while(WorldPreview.inPreview){
-                    LockSupport.parkNanos(5L * 1000000L); // I am at a loss to emphasize how bad of an idea Thread.yield() here is.
+                    LockSupport.park(); // I am at a loss to emphasize how bad of an idea Thread.yield() here is.
                 }
                 this.server.shutdown();
                 MinecraftClient.getInstance().disconnect();
