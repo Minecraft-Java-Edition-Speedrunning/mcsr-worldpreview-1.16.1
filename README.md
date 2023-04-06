@@ -53,6 +53,7 @@ You will not be able to reset after ~ when the chunk map reaches 100%. This is i
 
 - [@Void_X_Walker](https://www.github.com/voidxwalker) (https://ko-fi.com/voidxwalker)
 - [DuncanRuns](https://www.github.com/DuncanRuns)
+- [jojoe77777](https://www.github.com/jojoe77777)
 - [pixfumy](https://www.github.com/pixfumy)
 
 
