@@ -128,16 +128,7 @@ public abstract class LevelLoadingScreenMixin extends Screen {
 
     @Unique
     private Point worldpreview_getChunkMapPos() {
-        switch (WorldPreview.chunkMapPos) {
-            case 1:
-                return new Point(this.width - 45, this.height - 75);
-            case 2:
-                return new Point(this.width - 45, 105);
-            case 3:
-                return new Point(45, 105);
-            default:
-                return new Point(45, this.height - 75);
-        }
+        return new Point(45, this.height - 75);
     }
 
     @Unique

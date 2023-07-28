@@ -16,7 +16,10 @@ import net.minecraft.resource.ResourceReloadListener;
 import net.minecraft.server.integrated.IntegratedServer;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -43,8 +46,6 @@ public abstract class MinecraftClientMixin {
     @Shadow
     @Final
     private BufferBuilderStorage bufferBuilders;
-    @Unique
-    private int worldpreview_cycleCooldown;
 
     @Inject(method = "isFabulousGraphicsOrBetter", at = @At(value = "RETURN"), cancellable = true)
     private static void worldpreview_stopFabulous(CallbackInfoReturnable<Boolean> cir) {
@@ -59,11 +60,6 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "startIntegratedServer(Ljava/lang/String;Lnet/minecraft/util/registry/RegistryTracker$Modifiable;Ljava/util/function/Function;Lcom/mojang/datafixers/util/Function4;ZLnet/minecraft/client/MinecraftClient$WorldLoadAction;)V", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/integrated/IntegratedServer;isLoading()Z"), cancellable = true)
     public void worldpreview_onHotKeyPressed(CallbackInfo ci) {
         if (WorldPreview.inPreview) {
-            worldpreview_cycleCooldown++;
-            if (WorldPreview.cycleChunkMapKey.wasPressed() && worldpreview_cycleCooldown > 10 && !WorldPreview.freezePreview) {
-                worldpreview_cycleCooldown = 0;
-                WorldPreview.chunkMapPos = WorldPreview.chunkMapPos < 5 ? WorldPreview.chunkMapPos + 1 : 1;
-            }
             if (WorldPreview.resetKey.wasPressed() || WorldPreview.kill == -1) {
                 WorldPreview.log(Level.INFO, "Leaving world generation");
                 WorldPreview.kill = 1;
@@ -122,7 +118,6 @@ public abstract class MinecraftClientMixin {
             if (WorldPreview.worldRenderer != null) {
                 ((OldSodiumCompatibility) WorldPreview.worldRenderer).worldpreview_setWorldSafe(null);
             }
-            worldpreview_cycleCooldown = 0;
         }
     }
 

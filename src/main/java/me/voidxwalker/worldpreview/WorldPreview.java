@@ -36,8 +36,6 @@ public class WorldPreview implements ClientModInitializer {
     public static boolean calculatedSpawn;
     public static KeyBinding resetKey;
     public static KeyBinding freezeKey;
-    public static KeyBinding cycleChunkMapKey;
-    public static int chunkMapPos;
     public static boolean freezePreview;
     public static boolean hasStateOutput;
     public static Logger LOGGER = LogManager.getLogger();
@@ -61,13 +59,6 @@ public class WorldPreview implements ClientModInitializer {
                 this.translate("key.world_preview.freeze", "Freeze Preview").getString(),
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_J,
-                this.translate("key.categories.world_preview", "World Preview").getString()
-        ));
-
-        cycleChunkMapKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                this.translate("key.world_preview.cycle_chunkmap", "Cycle ChunkMap Positions").getString(),
-                InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_K,
                 this.translate("key.categories.world_preview", "World Preview").getString()
         ));
     }
