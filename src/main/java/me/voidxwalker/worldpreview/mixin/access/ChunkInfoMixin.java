@@ -8,8 +8,15 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(WorldRenderer.ChunkInfo.class)
 public interface ChunkInfoMixin {
-    @Accessor ChunkBuilder.BuiltChunk getChunk();
-    @Accessor Direction getDirection();
-    @Accessor byte getCullingState();
-    @Accessor int getPropagationLevel();
+    @Accessor
+    ChunkBuilder.BuiltChunk getChunk();
+
+    @Accessor
+    Direction getDirection();
+
+    @Accessor
+    byte getCullingState();
+
+    @Accessor
+    int getPropagationLevel();
 }

@@ -17,9 +17,13 @@ import java.io.IOException;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
 public abstract class ThreadedAnvilChunkStorageMixin extends VersionedChunkStorage implements IFastCloseable {
-    @Shadow @Final private ChunkTaskPrioritySystem chunkTaskPrioritySystem;
+    @Shadow
+    @Final
+    private ChunkTaskPrioritySystem chunkTaskPrioritySystem;
 
-    @Shadow @Final private PointOfInterestStorage pointOfInterestStorage;
+    @Shadow
+    @Final
+    private PointOfInterestStorage pointOfInterestStorage;
 
     public ThreadedAnvilChunkStorageMixin(File file, DataFixer dataFixer, boolean bl) {
         super(file, dataFixer, bl);
@@ -29,9 +33,9 @@ public abstract class ThreadedAnvilChunkStorageMixin extends VersionedChunkStora
     public void fastClose() throws IOException {
         try {
             this.chunkTaskPrioritySystem.close();
-            ((IFastCloseable)((SerializingRegionBasedStorageMixin)this.pointOfInterestStorage).getWorker()).fastClose();
+            ((IFastCloseable) ((SerializingRegionBasedStorageMixin) this.pointOfInterestStorage).getWorker()).fastClose();
         } finally {
-            ((IFastCloseable)((VersionedChunkStorageMixin)this).getWorker()).fastClose();
+            ((IFastCloseable) ((VersionedChunkStorageMixin) this).getWorker()).fastClose();
         }
     }
 }

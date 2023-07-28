@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface SpawnLocatingMixin {
     @Invoker
     static BlockPos callFindOverworldSpawn(ServerWorld world, int x, int z, boolean validSpawnNeeded) {
-       throw new IllegalStateException();
+        throw new IllegalStateException();
     }
 }

@@ -23,24 +23,28 @@ import java.util.Iterator;
 
 @Mixin(ServerChunkManager.class)
 public abstract class ServerChunkManagerMixin {
-    @Shadow @Final public ThreadedAnvilChunkStorage threadedAnvilChunkStorage;
+    @Shadow
+    @Final
+    public ThreadedAnvilChunkStorage threadedAnvilChunkStorage;
 
-    @Shadow public @Nullable abstract WorldChunk getWorldChunk(int chunkX, int chunkZ);
+    @Shadow
+    public @Nullable
+    abstract WorldChunk getWorldChunk(int chunkX, int chunkZ);
 
-    @Inject(method ="tick()Z",at = @At(value = "TAIL"))
-    public void worldpreview_getChunks(CallbackInfoReturnable<Boolean> cir){
-        synchronized (WorldPreview.lock){
-            if(WorldPreview.player!=null&& WorldPreview.calculatedSpawn&& !WorldPreview.freezePreview&&MinecraftClient.getInstance().currentScreen instanceof LevelLoadingScreen){
-                ClientChunkManager.ClientChunkMap map = ((((ClientChunkManagerMixin) WorldPreview.clientWord.getChunkManager()).getChunks()));
-                Iterator<ChunkHolder> iterator =  ((ThreadedAnvilChunkStorageMixin) this.threadedAnvilChunkStorage).getChunkHolders().values().stream().iterator();
-                while (iterator.hasNext()){
+    @Inject(method = "tick()Z", at = @At(value = "TAIL"))
+    public void worldpreview_getChunks(CallbackInfoReturnable<Boolean> cir) {
+        synchronized (WorldPreview.lock) {
+            if (WorldPreview.player != null && WorldPreview.calculatedSpawn && !WorldPreview.freezePreview && MinecraftClient.getInstance().currentScreen instanceof LevelLoadingScreen) {
+                ClientChunkManager.ClientChunkMap map = ((((ClientChunkManagerMixin) WorldPreview.clientWorld.getChunkManager()).getChunks()));
+                Iterator<ChunkHolder> iterator = ((ThreadedAnvilChunkStorageMixin) this.threadedAnvilChunkStorage).getChunkHolders().values().stream().iterator();
+                while (iterator.hasNext()) {
                     ChunkHolder holder = iterator.next();
-                    if(holder!=null){
-                        int index = ((ClientChunkMapMixin)(Object)(map)).callGetIndex(holder.getPos().x,holder.getPos().z);
-                        if(((ClientChunkMapMixin)(Object)(map)).callGetChunk(index)==null) {
-                            WorldChunk chunk = this.getWorldChunk(holder.getPos().x,holder.getPos().z);
-                            if(chunk!=null){
-                                ((ClientChunkMapMixin)(Object)(map)).callSet(index,chunk);
+                    if (holder != null) {
+                        int index = ((ClientChunkMapMixin) (Object) (map)).callGetIndex(holder.getPos().x, holder.getPos().z);
+                        if (((ClientChunkMapMixin) (Object) (map)).callGetChunk(index) == null) {
+                            WorldChunk chunk = this.getWorldChunk(holder.getPos().x, holder.getPos().z);
+                            if (chunk != null) {
+                                ((ClientChunkMapMixin) (Object) (map)).callSet(index, chunk);
                             }
                         }
                     }

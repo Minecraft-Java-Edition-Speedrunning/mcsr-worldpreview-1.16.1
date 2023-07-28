@@ -11,12 +11,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(StorageIoWorker.class)
-public class StorageIOWorkerMixin implements IFastCloseable {
-    @Shadow @Final private TaskExecutor<TaskQueue.PrioritizedTask> field_24468;
-
-    @Shadow @Final private RegionBasedStorage storage;
-
-    @Shadow @Final private static Logger LOGGER;
+public class StorageIoWorkerMixin implements IFastCloseable {
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    @Final
+    private TaskExecutor<TaskQueue.PrioritizedTask> field_24468;
+    @Shadow
+    @Final
+    private RegionBasedStorage storage;
 
     @Override
     public void fastClose() {
@@ -24,7 +28,7 @@ public class StorageIOWorkerMixin implements IFastCloseable {
         try {
             this.storage.close();
         } catch (Exception var3) {
-            this.LOGGER.error("Failed to close storage", (Throwable)var3);
+            LOGGER.error("Failed to close storage", var3);
         }
     }
 }

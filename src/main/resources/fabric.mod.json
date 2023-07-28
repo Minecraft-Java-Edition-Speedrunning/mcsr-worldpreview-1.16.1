@@ -12,7 +12,6 @@
   },
   "license": "MIT",
   "icon": "assets/worldpreview/icon.png",
-
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -20,7 +19,6 @@
     ]
   },
   "accessWidener": "worldpreview.accesswidener",
-
   "mixins": [
     "worldpreview.mixins.json"
   ],

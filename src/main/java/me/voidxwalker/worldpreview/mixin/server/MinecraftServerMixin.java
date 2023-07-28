@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -42,56 +43,67 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.function.Supplier;
 
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin  extends ReentrantThreadExecutor<ServerTask> {
+public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<ServerTask> {
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    @Final
+    protected LevelStorage.Session session;
+    @Shadow
+    @Final
+    private Snooper snooper;
+    @Shadow
+    private ServerResourceManager serverResourceManager;
+
     public MinecraftServerMixin(String string) {
         super(string);
     }
 
-    @Shadow public abstract @Nullable ServerWorld getWorld(RegistryKey<World> key);
+    @Shadow
+    public abstract @Nullable ServerWorld getWorld(RegistryKey<World> key);
 
-    @Shadow public abstract ServerWorld getOverworld();
+    @Shadow
+    public abstract ServerWorld getOverworld();
 
-    @Shadow public abstract Iterable<ServerWorld> getWorlds();
+    @Shadow
+    public abstract Iterable<ServerWorld> getWorlds();
 
-    @Shadow @Final private Snooper snooper;
+    @Shadow
+    public abstract @Nullable ServerNetworkIo getNetworkIo();
 
-    @Shadow private ServerResourceManager serverResourceManager;
+    @Shadow
+    public abstract Thread getThread();
 
-    @Shadow @Final protected LevelStorage.Session session;
-
-    @Shadow @Final private static Logger LOGGER;
-
-    @Shadow public abstract @Nullable ServerNetworkIo getNetworkIo();
-
-    @Shadow public abstract Thread getThread();
-
-    @Shadow public abstract int getSpawnRadius(@Nullable ServerWorld world);
+    @Shadow
+    public abstract int getSpawnRadius(@Nullable ServerWorld world);
 
     @Inject(method = "prepareStartRegion", at = @At(value = "HEAD"))
 
-    public void worldpreview_getWorld(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci){
-        WorldPreview.calculatedSpawn=false;
-        synchronized (WorldPreview.lock){
-            if(!WorldPreview.existingWorld){
+    public void worldpreview_getWorld(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
+        WorldPreview.calculatedSpawn = false;
+        synchronized (WorldPreview.lock) {
+            if (!WorldPreview.existingWorld) {
                 ServerWorld serverWorld = this.getOverworld();
-                WorldPreview.spawnPos= serverWorld.getSpawnPos();
-                WorldPreview.freezePreview=false;
-                WorldPreview.world=this.getWorld(World.OVERWORLD);
+                WorldPreview.spawnPos = serverWorld.getSpawnPos();
+                WorldPreview.freezePreview = false;
+                WorldPreview.world = this.getWorld(World.OVERWORLD);
                 RegistryKey<DimensionType> registryKey = DimensionType.OVERWORLD_REGISTRY_KEY;
                 RegistryKey<World> registryKey2 = World.OVERWORLD;
                 DimensionType dimensionType = DimensionType.getOverworldDimensionType();
                 ClientWorld.Properties properties = new ClientWorld.Properties(Difficulty.NORMAL, WorldPreview.world.getLevelProperties().isHardcore(), false);
-                Supplier<Profiler>s=MinecraftClient.getInstance()::getProfiler;
-                long seed = BiomeAccess.hashSeed(((ServerWorld)(WorldPreview.world)).getSeed());
-                WorldPreview.clientWord = new ClientWorld(null,properties, registryKey2, registryKey, dimensionType,16 , s,null,false, seed);
-                WorldPreview.player=new ClientPlayerEntity(MinecraftClient.getInstance(),WorldPreview.clientWord,new ClientPlayNetworkHandler(MinecraftClient.getInstance(),null,null,MinecraftClient.getInstance().getSession().getProfile()),null,null,false,false);
+                Supplier<Profiler> s = MinecraftClient.getInstance()::getProfiler;
+                long seed = BiomeAccess.hashSeed(((ServerWorld) (WorldPreview.world)).getSeed());
+                WorldPreview.clientWorld = new ClientWorld(null, properties, registryKey2, registryKey, dimensionType, 16, s, null, false, seed);
+                WorldPreview.player = new ClientPlayerEntity(MinecraftClient.getInstance(), WorldPreview.clientWorld, new ClientPlayNetworkHandler(MinecraftClient.getInstance(), null, null, MinecraftClient.getInstance().getSession().getProfile()), null, null, false, false);
                 worldpreview_calculateSpawn(serverWorld);
-                WorldPreview.calculatedSpawn=true;
+                WorldPreview.calculatedSpawn = true;
             }
-            WorldPreview.existingWorld=false;
+            WorldPreview.existingWorld = false;
         }
     }
 
+    @Unique
     private void worldpreview_calculateSpawn(ServerWorld serverWorld) {
         BlockPos blockPos = WorldPreview.spawnPos;
         int i = Math.max(0, this.getSpawnRadius((ServerWorld) WorldPreview.world));
@@ -122,49 +134,50 @@ public abstract class MinecraftServerMixin  extends ReentrantThreadExecutor<Serv
         }
     }
 
+    @Unique
     private int worldpreview_calculateSpawnOffsetMultiplier(int horizontalSpawnArea) {
         return horizontalSpawnArea <= 16 ? horizontalSpawnArea - 1 : 17;
     }
 
-    @Inject(method = "shutdown",at=@At(value = "HEAD"),cancellable = true)
-    public void worldpreview_kill(CallbackInfo ci){
-        if(MinecraftClient.getInstance().currentScreen instanceof LevelLoadingScreen&&Thread.currentThread().getId()!=this.getThread().getId()) {
+    @Inject(method = "shutdown", at = @At(value = "HEAD"), cancellable = true)
+    public void worldpreview_kill(CallbackInfo ci) {
+        if (MinecraftClient.getInstance().currentScreen instanceof LevelLoadingScreen && Thread.currentThread().getId() != this.getThread().getId()) {
             worldpreview_shutdownWithoutSave();
-           ci.cancel();
-        }
-    }
-
-    @Inject(method="runServer",at=@At(value="INVOKE",target="Lnet/minecraft/server/MinecraftServer;setupServer()Z",shift = At.Shift.AFTER), cancellable = true)
-    public void worldpreview_kill2(CallbackInfo ci){
-        WorldPreview.inPreview=false;
-        WorldPreview.renderingPreview=false;
-        LockSupport.unpark(((MinecraftClientMixin)MinecraftClient.getInstance()).invokeGetThread());
-        if(WorldPreview.kill==1){
             ci.cancel();
         }
     }
 
-    public void worldpreview_shutdownWithoutSave(){
+    @Inject(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;setupServer()Z", shift = At.Shift.AFTER), cancellable = true)
+    public void worldpreview_kill2(CallbackInfo ci) {
+        WorldPreview.inPreview = false;
+        WorldPreview.renderingPreview = false;
+        LockSupport.unpark(((MinecraftClientMixin) MinecraftClient.getInstance()).invokeGetThread());
+        if (WorldPreview.kill == 1) {
+            ci.cancel();
+        }
+    }
+
+    @Unique
+    public void worldpreview_shutdownWithoutSave() {
         LOGGER.info("Stopping server");
         if (this.getNetworkIo() != null) {
             this.getNetworkIo().stop();
         }
         Iterator var1 = this.getWorlds().iterator();
         ServerWorld serverWorld2;
-        while(var1.hasNext()) {
-            serverWorld2 = (ServerWorld)var1.next();
+        while (var1.hasNext()) {
+            serverWorld2 = (ServerWorld) var1.next();
             if (serverWorld2 != null) {
                 serverWorld2.savingDisabled = false;
             }
         }
-        Iterator<ServerWorld> var2 = this.getWorlds().iterator();
-        while(var2.hasNext()) {
-            serverWorld2 = var2.next();
+        for (ServerWorld serverWorld : this.getWorlds()) {
+            serverWorld2 = serverWorld;
             if (serverWorld2 != null) {
                 try {
-                    ((IFastCloseable)serverWorld2.getChunkManager().threadedAnvilChunkStorage).fastClose();
+                    ((IFastCloseable) serverWorld2.getChunkManager().threadedAnvilChunkStorage).fastClose();
+                } catch (IOException ignored) {
                 }
-                catch (IOException ignored) {}
             }
         }
         if (this.snooper.isActive()) {
@@ -178,10 +191,10 @@ public abstract class MinecraftServerMixin  extends ReentrantThreadExecutor<Serv
         }
     }
 
-    @Inject(method = "prepareStartRegion",at=@At(value = "INVOKE",target = "Lnet/minecraft/server/world/ServerChunkManager;getTotalChunksLoadedCount()I",shift = At.Shift.AFTER),cancellable = true)
-    public void worldpreview_kill(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci){
-        if(WorldPreview.kill==1){
-           ci.cancel();
+    @Inject(method = "prepareStartRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerChunkManager;getTotalChunksLoadedCount()I", shift = At.Shift.AFTER), cancellable = true)
+    public void worldpreview_kill(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
+        if (WorldPreview.kill == 1) {
+            ci.cancel();
         }
     }
 }

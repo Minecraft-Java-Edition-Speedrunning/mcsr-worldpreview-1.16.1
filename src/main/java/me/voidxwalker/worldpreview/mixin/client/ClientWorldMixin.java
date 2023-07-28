@@ -8,10 +8,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.dimension.DimensionType;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,25 +18,29 @@ import java.util.function.Supplier;
 
 @Mixin(ClientWorld.class)
 public class ClientWorldMixin {
-    @Mutable @Shadow @Final private ClientChunkManager chunkManager;
+    @Mutable
+    @Shadow
+    @Final
+    private ClientChunkManager chunkManager;
 
-    @Redirect(method = "<init>",at=@At(value="INVOKE",target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getRegistryTracker()Lnet/minecraft/util/registry/RegistryTracker;"))
-    public RegistryTracker worldpreview_stopLag(ClientPlayNetworkHandler instance){
-        if(instance==null){
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getRegistryTracker()Lnet/minecraft/util/registry/RegistryTracker;"))
+    public RegistryTracker worldpreview_stopLag(ClientPlayNetworkHandler instance) {
+        if (instance == null) {
             return RegistryTracker.create();
         }
         return instance.getRegistryTracker();
     }
 
-    @Inject(method ="<init>",at=@At("TAIL"))
-    public void worldpreview_oldSodiumCompatibility(ClientPlayNetworkHandler clientPlayNetworkHandler, ClientWorld.Properties properties, RegistryKey registryKey, RegistryKey registryKey2, DimensionType dimensionType, int i, Supplier supplier, WorldRenderer worldRenderer, boolean bl, long l, CallbackInfo ci){
-        if(WorldPreview.camera==null&& WorldPreview.world!=null&& WorldPreview.spawnPos!=null){
-            this.chunkManager=worldpreview_getChunkManager(i);
+    @Inject(method = "<init>", at = @At("TAIL"))
+    public void worldpreview_oldSodiumCompatibility(ClientPlayNetworkHandler clientPlayNetworkHandler, ClientWorld.Properties properties, RegistryKey registryKey, RegistryKey registryKey2, DimensionType dimensionType, int i, Supplier supplier, WorldRenderer worldRenderer, boolean bl, long l, CallbackInfo ci) {
+        if (WorldPreview.camera == null && WorldPreview.world != null && WorldPreview.spawnPos != null) {
+            this.chunkManager = worldpreview_getChunkManager(i);
         }
 
     }
 
-    private ClientChunkManager worldpreview_getChunkManager(int i){
-        return new ClientChunkManager((ClientWorld) (Object)this, i);
+    @Unique
+    private ClientChunkManager worldpreview_getChunkManager(int i) {
+        return new ClientChunkManager((ClientWorld) (Object) this, i);
     }
 }
