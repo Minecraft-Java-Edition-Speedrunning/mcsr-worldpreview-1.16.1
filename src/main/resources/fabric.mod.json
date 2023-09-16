@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "${mod_id}",
+  "id": "worldpreview",
   "version": "${version}",
   "name": "WorldPreview",
   "description": "Makes you reset block game fast",
@@ -23,6 +23,6 @@
     "worldpreview.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.12.0"
+    "fabricloader": ">=0.12.12"
   }
 }

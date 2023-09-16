@@ -3,15 +3,13 @@ package me.voidxwalker.worldpreview;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
@@ -38,6 +36,7 @@ public class WorldPreview implements ClientModInitializer {
     public static KeyBinding freezeKey;
     public static boolean freezePreview;
     public static boolean hasStateOutput;
+    public static MinecraftClient client = MinecraftClient.getInstance();
     public static Logger LOGGER = LogManager.getLogger();
 
     public static void log(Level level, String message) {
@@ -49,26 +48,17 @@ public class WorldPreview implements ClientModInitializer {
         hasStateOutput = FabricLoader.getInstance().isModLoaded("state-output");
 
         resetKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                this.translate("key.world_preview.reset", "Leave Preview").getString(),
+                "Leave Preview",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_H,
-                this.translate("key.categories.world_preview", "World Preview").getString()
+                "key.categories.world_preview"
         ));
 
         freezeKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                this.translate("key.world_preview.freeze", "Freeze Preview").getString(),
+                "Freeze Preview",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_J,
-                this.translate("key.categories.world_preview", "World Preview").getString()
+                "key.categories.world_preview"
         ));
     }
-
-    public Text translate(String key, String replacement) {
-        Text t = new TranslatableText(key);
-        if (t.getString().equals(key)) {
-            return new LiteralText(replacement);
-        }
-        return t;
-    }
-
 }

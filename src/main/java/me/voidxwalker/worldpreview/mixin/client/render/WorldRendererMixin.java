@@ -19,7 +19,6 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.screen.LevelLoadingScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.CloudRenderMode;
-import net.minecraft.client.options.Option;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.chunk.ChunkBuilder;
@@ -30,7 +29,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3d;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
 import net.minecraft.util.profiler.Profiler;
 import org.jetbrains.annotations.Nullable;
@@ -52,31 +50,40 @@ import java.util.Set;
 @SuppressWarnings("deprecation")
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererMixin implements OldSodiumCompatibility {
-
     @Shadow
     @Final
     public static Direction[] DIRECTIONS;
+
     @Shadow
     private ClientWorld world;
+
     @Shadow
     @Final
     private MinecraftClient client;
+
     @Shadow
     private BuiltChunkStorage chunks;
+
     @Shadow
     private ChunkBuilder chunkBuilder;
+
     @Shadow
     @Final
     private ObjectList<WorldRenderer.ChunkInfo> visibleChunks;
+
     @Shadow
     @Final
     private VertexFormat vertexFormat;
+
     @Shadow
     private double lastTranslucentSortY;
+
     @Shadow
     private double lastTranslucentSortX;
+
     @Shadow
     private double lastTranslucentSortZ;
+
     @Shadow
     private int renderDistance;
 
@@ -121,23 +128,27 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
     @Shadow
     @Final
     private EntityRenderDispatcher entityRenderDispatcher;
+
     @Shadow
     @Final
     private Set<BlockEntity> noCullingBlockEntities;
+
     @Shadow
     @Final
     private BufferBuilderStorage bufferBuilders;
+
     @Shadow
     private @Nullable ShaderEffect transparencyShader;
+
     @Shadow
     private @Nullable Framebuffer translucentFramebuffer;
+
     @Unique
     private boolean previewRenderer = false;
-    @Shadow
-    @Final
-    private FpsSmoother chunkUpdateSmoother;
+
     @Shadow
     private @Nullable Frustum capturedFrustum;
+
     @Shadow
     @Final
     private Vector3d capturedFrustumPosition;
@@ -170,6 +181,7 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
     @Shadow
     protected abstract void checkEmpty(MatrixStack matrices);
 
+    @SuppressWarnings("AddedMixinMembersNamePattern")
     @Override
     public void setPreviewRenderer() {
         this.previewRenderer = true;
@@ -239,7 +251,6 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
         this.client.getProfiler().swap("culling");
         BlockPos blockPos = camera.getBlockPos();
         ChunkBuilder.BuiltChunk builtChunk = ((BuiltChunkStorageMixin) this.chunks).callGetRenderedChunk(blockPos);
-        int i = 16;
         BlockPos blockPos2 = new BlockPos(MathHelper.floor(vec3d.x / 16.0) * 16, MathHelper.floor(vec3d.y / 16.0) * 16, MathHelper.floor(vec3d.z / 16.0) * 16);
         float g = camera.getPitch();
         float h = camera.getYaw();
@@ -319,7 +330,7 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
 
         this.client.getProfiler().swap("rebuildNear");
         Set<ChunkBuilder.BuiltChunk> set = this.chunksToRebuild;
-        this.chunksToRebuild = Sets.<ChunkBuilder.BuiltChunk>newLinkedHashSet();
+        this.chunksToRebuild = Sets.newLinkedHashSet();
 
         for (WorldRenderer.ChunkInfo chunkInfo : this.visibleChunks) {
             ChunkBuilder.BuiltChunk builtChunk3 = ((ChunkInfoMixin) chunkInfo).getChunk();
@@ -363,19 +374,6 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
             frustum = new Frustum(matrix4f2, matrix4f);
             frustum.setPosition(d, e, f);
         }
-        int j = this.client.options.maxFps;
-        long l = 33333333L;
-        long m;
-        if ((double) j == Option.FRAMERATE_LIMIT.getMax()) {
-            m = 0L;
-        } else {
-            m = 1000000000 / j;
-        }
-
-        long n = Util.getMeasuringTimeNano() - limitTime;
-        long o = this.chunkUpdateSmoother.getTargetUsedTime(n);
-        long p = o * 3L / 2L;
-        long q = MathHelper.clamp(p, m, 33333333L);
 
         if (this.world.getSkyProperties().isDarkened()) {
             DiffuseLighting.enableForLevel(matrices.peek().getModel());
@@ -404,6 +402,7 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
             }
         }
 
+        //noinspection SynchronizeOnNonFinalField
         synchronized (this.noCullingBlockEntities) {
             for (BlockEntity blockEntity2 : this.noCullingBlockEntities) {
                 BlockPos blockPos2 = blockEntity2.getPos();
@@ -429,7 +428,6 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
 
         RenderSystem.pushMatrix();
         RenderSystem.multMatrix(matrices.peek().getModel());
-        this.client.debugRenderer.render(matrices, immediate, d, e, f);
         RenderSystem.popMatrix();
         immediate.draw(TexturedRenderLayers.getEntityTranslucentCull());
         immediate.draw(TexturedRenderLayers.getBannerPatterns());
@@ -443,6 +441,7 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
         immediate.draw(RenderLayer.getLines());
         immediate.draw();
         if (this.transparencyShader != null) {
+            assert this.translucentFramebuffer != null;
             this.translucentFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.translucentFramebuffer.copyDepthFrom(this.client.getFramebuffer());
         }
@@ -624,6 +623,7 @@ public abstract class WorldRendererMixin implements OldSodiumCompatibility {
         if (client.currentScreen instanceof LevelLoadingScreen && instance == null && this.previewRenderer) {
             return false;
         }
+        assert instance != null;
         return instance.isSpectator();
     }
 
