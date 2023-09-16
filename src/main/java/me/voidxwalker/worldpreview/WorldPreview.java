@@ -3,7 +3,6 @@ package me.voidxwalker.worldpreview;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.Camera;
@@ -36,7 +35,6 @@ public class WorldPreview implements ClientModInitializer {
     public static KeyBinding freezeKey;
     public static boolean freezePreview;
     public static boolean hasStateOutput;
-    public static MinecraftClient client = MinecraftClient.getInstance();
     public static Logger LOGGER = LogManager.getLogger();
 
     public static void log(Level level, String message) {
