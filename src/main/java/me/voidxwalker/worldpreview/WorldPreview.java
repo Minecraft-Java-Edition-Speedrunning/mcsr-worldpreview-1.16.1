@@ -9,18 +9,12 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.resource.Resource;
-import net.minecraft.util.Language;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class WorldPreview implements ClientModInitializer {
     public static final Object lock = new Object();
@@ -45,13 +39,6 @@ public class WorldPreview implements ClientModInitializer {
 
     public static void log(Level level, String message) {
         LOGGER.log(level, message);
-    }
-
-    public static void loadTranslations(List<Resource> resources, Map<String, String> translationMap) {
-        resources.forEach(resource ->
-                Optional.ofNullable(WorldPreview.class.getResourceAsStream("assets/worldpreview/" + resource.getId().getPath()))
-                        .ifPresent(langStream -> Language.load(langStream, translationMap::put))
-        );
     }
 
     @Override

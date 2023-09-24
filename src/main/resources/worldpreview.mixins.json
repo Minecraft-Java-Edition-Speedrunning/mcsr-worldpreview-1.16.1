@@ -19,7 +19,6 @@
     "client.ClientWorldMixin",
     "client.KeyboardMixin",
     "client.MinecraftClientMixin",
-    "client.TranslationStorageMixin",
     "client.render.LevelLoadingScreenMixin",
     "client.render.WorldRendererMixin",
     "client.render.block.BlockModelRendererMixin",
