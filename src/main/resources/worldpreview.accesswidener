@@ -2,3 +2,4 @@ accessWidener   v1      named
 accessible    class    net/minecraft/client/world/ClientChunkManager$ClientChunkMap
 accessible    class    net/minecraft/client/render/WorldRenderer$ChunkInfo
 accessible    method    net/minecraft/client/render/WorldRenderer$ChunkInfo    <init>    (Lnet/minecraft/client/render/WorldRenderer;Lnet/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk;Lnet/minecraft/util/math/Direction;I)V
+accessible    field    net/minecraft/world/level/storage/LevelStorage$Session    lock    Lnet/minecraft/world/level/storage/SessionLock;
