@@ -35,6 +35,7 @@
     "server.MinecraftServerMixin",
     "server.ServerChunkManagerMixin",
     "server.ServerPlayerEntityMixin",
+    "server.LevelStorage$SessionMixin",
 
     "server.shutdown.StorageIOWorkerMixin",
     "server.shutdown.ThreadedAnvilChunkStorageMixin"
