@@ -61,6 +61,8 @@ public abstract class MinecraftServerMixin  extends ReentrantThreadExecutor<Serv
 
     @Shadow @Final private static Logger LOGGER;
 
+    @Shadow private volatile boolean running;
+
     @Shadow public abstract @Nullable ServerNetworkIo getNetworkIo();
 
     @Shadow public abstract Thread getThread();
@@ -182,6 +184,13 @@ public abstract class MinecraftServerMixin  extends ReentrantThreadExecutor<Serv
     public void worldpreview_kill(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci){
         if(WorldPreview.kill==1){
            ci.cancel();
+        }
+    }
+
+    @Inject(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;setFavicon(Lnet/minecraft/server/ServerMetadata;)V", shift = At.Shift.AFTER))
+    private void worldpreview_cancelRunServer(CallbackInfo ci) {
+        if (!this.session.lock.isValid()) {
+            this.running = false;
         }
     }
 }
