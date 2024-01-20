@@ -2,7 +2,6 @@ package me.voidxwalker.worldpreview.mixin.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.voidxwalker.worldpreview.OldSodiumCompatibility;
-import me.voidxwalker.worldpreview.StateOutputHelper;
 import me.voidxwalker.worldpreview.WorldPreview;
 import me.voidxwalker.worldpreview.mixin.access.WorldRendererMixin;
 import net.minecraft.client.MinecraftClient;
@@ -20,7 +19,6 @@ import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.Matrix4f;
-import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -43,8 +41,6 @@ public abstract class LevelLoadingScreenMixin extends Screen {
         WorldPreview.calculatedSpawn=true;
         WorldPreview.freezePreview=false;
         KeyBinding.unpressAll();
-        StateOutputHelper.loadingProgress = 0;
-        StateOutputHelper.outputState("generating,0");
     }
     @Redirect(method = "render",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/screen/LevelLoadingScreen;renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V"))
     public void worldpreview_stopBackgroundRender(LevelLoadingScreen instance, MatrixStack matrixStack){
