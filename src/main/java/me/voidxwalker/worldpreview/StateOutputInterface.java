@@ -4,7 +4,7 @@ import dev.tildejustin.stateoutput.*;
 
 public class StateOutputInterface {
     public static void outputPreviewing() {
-        // ideally it would take the progress of State.GENERATING, but that is inaccessible and always 0 anyway
-        StateOutputHelper.outputState(State.PREVIEW.withProgress(0));
+        // change the state to previewing, without changing the static progress
+        StateOutputHelper.outputState(State.PREVIEW);
     }
 }
